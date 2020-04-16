@@ -25,11 +25,19 @@ class Powershell < Formula
 
       Other application files were installed at:
         #{libexec}
+
+      If you also have the Cask installed, you need to run the following to make the formula your default install:
+        brew link --overwrite powershell
+
+      If you would like to make PowerShell you shell, run
+        sudo echo '#{bin}/pwsh' >> /etc/shells
+        chsh -s #{bin}/pwsh
     EOS
   end
 
   test do
     system bin/"pwsh", "-v"
     system bin/"pwsh", "-c", "$psversiontable.psversion.tostring()"
+    system bin/"pwsh", "-c", "Get-Module -listavailable"
   end
 end
