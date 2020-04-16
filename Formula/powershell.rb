@@ -12,8 +12,6 @@ class Powershell < Formula
   # .NET Core 3.1 requires High Sierra - https://docs.microsoft.com/en-us/dotnet/core/install/dependencies?pivots=os-macos&tabs=netcore31
   depends_on :macos => :high_sierra
 
-  conflicts_with :cask => "powershell"
-
   def install
     libexec.install Dir["*"]
     chmod 0555, libexec/"pwsh"
@@ -27,11 +25,17 @@ class Powershell < Formula
 
       Other application files were installed at:
         #{libexec}
+
+      If you also have the Cask installed, you need to run the following to make the formula your default install:
+        brew link --overwrite powershell
+
+      If you would like to make PowerShell you shell, run
+        sudo echo '#{bin}/pwsh' >> /etc/shells
+        chsh -s #{bin}/pwsh
     EOS
   end
 
   test do
-    system bin/"pwsh", "-v"
-    system bin/"pwsh", "-c", "$psversiontable.psversion.tostring()"
+    assert_equal "7.0.0", shell_output("#{bin}/pwsh -c '$psversiontable.psversion.tostring()'").strip
   end
 end
