@@ -29,11 +29,9 @@ jobs:
           /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
       - name: brew install (Verify install of formula)
         run: |
+          brew cask uninstall powershell
           brew install --verbose --build-from-source $env:FORMULA_PATH
-      - name: brew link (Verify install of formula)
-        run: |
-          brew link --overwrite $env:FORMULA_NAME
-        # See https://docs.brew.sh/Formula-Cookbook#audit-the-formula
+      # See https://docs.brew.sh/Formula-Cookbook#audit-the-formula
       - name: brew audit (Audit formula)
         run: |
           brew audit --strict --online --display-filename --display-cop-names $env:FORMULA_PATH
