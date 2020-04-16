@@ -12,6 +12,8 @@ class Powershell < Formula
   # .NET Core 3.1 requires High Sierra - https://docs.microsoft.com/en-us/dotnet/core/install/dependencies?pivots=os-macos&tabs=netcore31
   depends_on :macos => :high_sierra
 
+  conflicts_with :cask => "powershell"
+
   def install
     libexec.install Dir["*"]
     chmod 0555, libexec/"pwsh"
