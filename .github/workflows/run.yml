@@ -13,6 +13,7 @@ on:
 env:
   FORMULA_PATH: ./Formula/powershell.rb
   UPDATE_SCRIPT_PATH: ./scripts/update_formula.ps1
+  FORMULA_NAME: powershell
 jobs:
   homebrew-formula:
     runs-on: macos-latest
@@ -26,7 +27,10 @@ jobs:
       - name: brew install (Verify install of formula)
         run: |
           brew install --verbose --build-from-source $FORMULA_PATH
-      # See https://docs.brew.sh/Formula-Cookbook#audit-the-formula
+      - name: brew link (Verify install of formula)
+        run: |
+          brew link $FORMULA_NAME
+        # See https://docs.brew.sh/Formula-Cookbook#audit-the-formula
       - name: brew audit (Audit formula)
         run: |
           brew audit --strict --online --display-filename --display-cop-names $FORMULA_PATH
