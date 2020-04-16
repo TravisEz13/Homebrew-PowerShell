@@ -36,8 +36,6 @@ class Powershell < Formula
   end
 
   test do
-    system bin/"pwsh", "-v"
-    system bin/"pwsh", "-c", "$psversiontable.psversion.tostring()"
-    system bin/"pwsh", "-c", "Get-Module -listavailable"
+    assert_equal "7.0.0", shell_output("#{bin}/pwsh -c '$psversiontable.psversion.tostring()'").strip
   end
 end
