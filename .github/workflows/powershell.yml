@@ -7,7 +7,7 @@ on:
     branches:
       - master
   pull_request:
-    paths-ignore:
+    paths:
       - '.github/workflows/powershell.yml'
       - 'Formula/powershell.rb'
   #schedule:
