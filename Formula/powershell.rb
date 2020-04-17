@@ -7,6 +7,7 @@ class Powershell < Formula
   url "https://github.com/PowerShell/PowerShell/releases/download/v7.0.0/powershell-7.0.0-osx-x64.tar.gz"
   # must be lower-case
   sha256 "7ea2a539cb33f3c1c62280eea1d3b55cbd84c86676437a390e81c0ae374483e6"
+  version_scheme "7.0.0"
   bottle :unneeded
 
   # .NET Core 3.1 requires High Sierra - https://docs.microsoft.com/en-us/dotnet/core/install/dependencies?pivots=os-macos&tabs=netcore31
