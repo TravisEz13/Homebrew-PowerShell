@@ -6,6 +6,7 @@
 
 * [Stable](#powershell-stable)
 * [Preview](#powershell-preview)
+* [LTS](#powershell-lts)
 
 Learn more about using PowerShell ...
 
@@ -39,6 +40,20 @@ To upgrade to the latest version, run:
 
 ```
 brew upgrade powershell-preview
+```
+
+### PowerShell LTS
+
+```
+brew install travisez13/tap/powershell-lts
+```
+
+You can now run the `pwsh-lts` to get started.
+
+To upgrade to the latest version, run:
+
+```
+brew upgrade powershell-lts
 ```
 
 ## Microsoft Open Source Code of Conduct
