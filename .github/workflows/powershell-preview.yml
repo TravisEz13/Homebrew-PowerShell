@@ -1,12 +1,14 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT license.
 
-name: Action
+name: PowerShell preview Formula
 on:
   push:
     branches:
       - master
   pull_request:
+    paths-ignore:
+      - 'Formula/powershell.rb'
   #schedule:
     # At 16:00 UTC on every day-of-week from Monday through Friday.
   #  - cron:  '0 16 * * 1-5'
@@ -14,9 +16,9 @@ defaults:
   run:
     shell: pwsh
 env:
-  FORMULA_PATH: ./Formula/powershell.rb
+  FORMULA_PATH: ./Formula/powershell-preview.rb
   UPDATE_SCRIPT_PATH: ./scripts/update_formula.ps1
-  FORMULA_NAME: powershell
+  FORMULA_NAME: powershell-preview
 jobs:
   homebrew-formula:
     runs-on: macos-latest
@@ -27,10 +29,6 @@ jobs:
       - name: Install homebrew prerequisite
         run: |
           /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-      - name: brew uninstall cask
-        shell: bash
-        run: |
-          brew cask uninstall $FORMULA_NAME || true
       - name: brew install (Verify install of formula)
         shell: bash
         run: |
@@ -43,23 +41,3 @@ jobs:
       - name: brew test (Verify tests in formula)
         run: |
           brew test $env:FORMULA_PATH
-      # - name: (scheduled-auto-release) Commit & Push changes
-      #   if: github.event_name == 'schedule' 
-      #   run: |
-      #     git diff
-      #     if git diff --exit-code $FORMULA_PATH
-      #     then
-      #       echo "Nothing to do."
-      #     else
-      #       echo "Pushing changes."
-      #       git config --local user.email "action@github.com"
-      #       git config --local user.name "GitHub Action"
-      #       git add $FORMULA_PATH
-      #       if [ -z "$NEW_FORMULA_VERSION" ]
-      #       then
-      #             git commit -m "Update powershell formula version"
-      #       else
-      #             git commit -m "Update powershell formula to version $NEW_FORMULA_VERSION"
-      #       fi
-      #       git push "https://${GITHUB_ACTOR}:${{secrets.GITHUB_TOKEN}}@github.com/${GITHUB_REPOSITORY}.git" HEAD:master
-      #     fi
