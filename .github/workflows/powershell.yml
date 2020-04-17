@@ -7,6 +7,8 @@ on:
     branches:
       - master
   pull_request:
+    paths-ignore:
+      - 'Formula/powershell-preview.rb'
   #schedule:
     # At 16:00 UTC on every day-of-week from Monday through Friday.
   #  - cron:  '0 16 * * 1-5'
@@ -44,7 +46,7 @@ jobs:
         run: |
           brew test $env:FORMULA_PATH
       # - name: (scheduled-auto-release) Commit & Push changes
-      #   if: github.event_name == 'schedule' 
+      #   if: github.event_name == 'schedule'
       #   run: |
       #     git diff
       #     if git diff --exit-code $FORMULA_PATH
