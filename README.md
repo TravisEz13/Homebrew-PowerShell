@@ -1,7 +1,7 @@
 **Homebrew tap for PowerShell.**
 
 ```
-brew install travisez13/powershell/powershell
+brew install travisez13/tap/powershell
 ```
 
 You can now run the `pwsh` to get started.
