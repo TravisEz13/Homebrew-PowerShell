@@ -38,8 +38,6 @@ $urlTemplate = 'https://github.com/PowerShell/PowerShell/releases/download/v{0}/
 
 $formulaString = Get-Content -Path $FormulaPath
 
-$formulaString | Write-Verbose -Verbose
-#'  version_scheme "7.0.0-preview.1"'
 function Get-FormulaString
 {
     param(
