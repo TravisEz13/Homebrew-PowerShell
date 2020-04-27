@@ -1,3 +1,5 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
 param(
     [Parameter(Mandatory)]
     [string]
@@ -70,13 +72,10 @@ Write-Verbose $newVersionSchemeString -Verbose
 $sha256Pattern = '^.\s*sha256\s*"([^"]*)"$'
 $sha256String = $formulaString | Select-String -Raw -Pattern $sha256Pattern
 Write-Verbose $sha256String -Verbose
-<#
 Invoke-WebRequest -Uri $url -OutFile ./FileToHash.file
 
 $hash = (Get-FileHash -Path ./FileToHash.file -Algorithm SHA256).Hash.ToLower()
 Remove-Item ./FileToHash.file
-#>
-$hash = "3dbf802402e43816396909a1b95fe65c2f135bb7991cd20ebb3d9423187d4f7d"
 Write-Verbose "hash: $hash"
 
 $newSha256String = $sha256String -replace '"([^"]*)"', ('"{0}"' -f $hash)
