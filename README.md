@@ -1,4 +1,20 @@
-**Homebrew tap for PowerShell.**
+# Homebrew tap for PowerShell Products
+
+## Fomula List
+
+### PowerShell Channels
+
+* [Stable](#powershell-stable)
+* [Preview](#powershell-preview)
+* [LTS](#powershell-lts)
+
+Learn more about using PowerShell ...
+
+Issues can be reported at [PowerShell/PowerShell](https://github.com/PowerShell/PowerShell/issues/new/choose).
+
+## Install Insturctions
+
+### PowerShell Stable
 
 ```
 brew install travisez13/tap/powershell
@@ -12,9 +28,33 @@ To upgrade to the latest version, run:
 brew upgrade powershell
 ```
 
-Learn more about using PowerShell ...
+### PowerShell Preview
 
-Issues can be reported at [PowerShell/PowerShell](https://github.com/PowerShell/PowerShell/issues/new/choose).
+```
+brew install travisez13/tap/powershell-preview
+```
+
+You can now run the `pwsh-preview` to get started.
+
+To upgrade to the latest version, run:
+
+```
+brew upgrade powershell-preview
+```
+
+### PowerShell LTS
+
+```
+brew install travisez13/tap/powershell-lts
+```
+
+You can now run the `pwsh-lts` to get started.
+
+To upgrade to the latest version, run:
+
+```
+brew upgrade powershell-lts
+```
 
 ## Microsoft Open Source Code of Conduct
 
