@@ -52,6 +52,8 @@ if ($versionMatch) {
     return
 }
 
+Write-Host "::set-env name=NEW_FORMULA_VERSION::$expectedVersion"
+
 $url = $urlTemplate -f $expectedVersion
 Write-Verbose "new url: $url" -Verbose
 
