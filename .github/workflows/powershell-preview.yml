@@ -10,16 +10,17 @@ on:
     paths:
       - '.github/workflows/powershell-preview.yml'
       - 'Formula/powershell-preview.rb'
-  #schedule:
-    # At 16:00 UTC on every day-of-week from Monday through Friday.
-  #  - cron:  '0 16 * * 1-5'
+  schedule:
+    # At 20:20 UTC on every day-of-week from Monday through Friday.
+    - cron:  '47 22 * * 1-5'
 defaults:
   run:
     shell: pwsh
 env:
   FORMULA_PATH: ./Formula/powershell-preview.rb
-  UPDATE_SCRIPT_PATH: ./scripts/update_formula.ps1
+  UPDATE_SCRIPT_PATH: ./scripts/Upgrade-Formula.ps1
   FORMULA_NAME: powershell-preview
+  CHANNEL_NAME: preview
 jobs:
   homebrew-formula:
     runs-on: macos-latest
@@ -30,6 +31,10 @@ jobs:
       - name: Install homebrew prerequisite
         run: |
           /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+      - name: (scheduled-auto-release) Auto-update formula
+        if: github.event_name == 'schedule'
+        run: |
+          &$env:UPDATE_SCRIPT_PATH -FormulaPath $env:FORMULA_PATH -Channel $env:CHANNEL_NAME
       - name: brew install (Verify install of formula)
         shell: bash
         run: |
@@ -42,3 +47,26 @@ jobs:
       - name: brew test (Verify tests in formula)
         run: |
           brew test $env:FORMULA_PATH
+      - name: (scheduled-auto-release) Commit & Push changes
+        if: github.event_name == 'schedule'
+        run: |
+          git diff --exit-code $env:FORMULA_PATH
+          if($lastexitcode -eq 0)
+          {
+            Write-Host "Nothing to do."
+          }
+          else
+          {
+            Write-Host "Pushing changes."
+            git config --local user.email "action@github.com"
+            git config --local user.name "GitHub Action"
+            git add $env:FORMULA_PATH
+            if(!$env:NEW_FORMULA_VERSION) {
+                  git commit -m "Update vso formula version"
+            }
+            else
+            {
+                  git commit -m "Update vso formula to version $env:NEW_FORMULA_VERSION"
+            }
+            git push "https://${env:GITHUB_ACTOR}:${{secrets.GITHUB_TOKEN}}@github.com/${env:GITHUB_REPOSITORY}.git" HEAD:master
+          }
