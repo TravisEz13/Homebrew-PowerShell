@@ -1,15 +1,15 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT license.
 
-name: PowerShell preview Formula
+name: PowerShell daily Formula
 on:
   push:
     branches:
       - master
   pull_request:
     paths:
-      - '.github/workflows/powershell-preview.yml'
-      - 'Formula/powershell-preview.rb'
+      - '.github/workflows/powershell-daily.yml'
+      - 'Formula/powershell-daily.rb'
   schedule:
     # At 20:20 UTC on every day-of-week from Monday through Friday.
     - cron:  '35 01 * * 1-5'
@@ -17,10 +17,10 @@ defaults:
   run:
     shell: pwsh
 env:
-  FORMULA_PATH: ./Formula/powershell-preview.rb
+  FORMULA_PATH: ./Formula/powershell-daily.rb
   UPDATE_SCRIPT_PATH: ./scripts/Upgrade-Formula.ps1
-  FORMULA_NAME: powershell-preview
-  CHANNEL_NAME: preview
+  FORMULA_NAME: powershell-daily
+  CHANNEL_NAME: daily
 jobs:
   homebrew-formula:
     runs-on: macos-latest

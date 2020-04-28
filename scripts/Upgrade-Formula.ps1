@@ -12,6 +12,7 @@ param(
 $retryCount = 3
 $retryIntervalSec = 15
 
+$urlTemplate = 'https://github.com/PowerShell/PowerShell/releases/download/v{0}/powershell-{0}-osx-x64.tar.gz'
 Switch ($Channel) {
     'Stable' {
         $metadata = Invoke-RestMethod 'https://aka.ms/pwsh-buildinfo-stable' -MaximumRetryCount $retryCount -RetryIntervalSec $retryIntervalSec
@@ -23,7 +24,8 @@ Switch ($Channel) {
         $metadata = Invoke-RestMethod 'https://aka.ms/pwsh-buildinfo-preview' -MaximumRetryCount $retryCount -RetryIntervalSec $retryIntervalSec
     }
     'Daily' {
-        $metadata = Invoke-RestMethod 'https://aka.ms/pwsh-buildinfo-preview' -MaximumRetryCount $retryCount -RetryIntervalSec $retryIntervalSec
+        $metadata = Invoke-RestMethod 'https://aka.ms/pwsh-buildinfo-Daily' -MaximumRetryCount $retryCount -RetryIntervalSec $retryIntervalSec
+        $urlTemplate = "https://pscoretestdata.blob.core.windows.net/$($metadata.blobname)/powershell-{0}-osx-x64.tar.gz"
     }
     default {
         throw "Invalid channel: $Channel"
@@ -34,7 +36,6 @@ $expectedVersion = $metadata.ReleaseTag -replace '^v'
 Write-Verbose "Expected version: $expectedVersion" -verbose
 
 $ErrorActionPreference = "stop"
-$urlTemplate = 'https://github.com/PowerShell/PowerShell/releases/download/v{0}/powershell-{0}-osx-x64.tar.gz'
 
 $formulaString = Get-Content -Path $FormulaPath
 
