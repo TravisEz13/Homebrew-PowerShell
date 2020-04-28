@@ -47,7 +47,7 @@ jobs:
       - name: brew test (Verify tests in formula)
         run: |
           brew test $env:FORMULA_PATH
-      - name: Create Pull Request
+      - name: (scheduled-auto-release) Create Pull Request
         if: github.event_name == 'schedule'
         id: cpr
         uses: peter-evans/create-pull-request@v2
