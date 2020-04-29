@@ -41,6 +41,7 @@ $ErrorActionPreference = "stop"
 
 $formulaString = Get-Content -Path $FormulaPath
 
+$newFormula = [System.Text.StringBuilder]::new($formulaString -join [System.Environment]::NewLine)
 function Get-FormulaString
 {
     param(
@@ -115,41 +116,35 @@ function Update-Formula {
         $newPropertyString = $propertyString -replace '"([^"]*)"', ('"{0}"' -f $NewValue)
     }
 
-    Write-Verbose "replacing '$propertyString' with '$newPropertyString'" -Verbose
+    Write-Verbose "`nreplacing '$propertyString'`n     with '$newPropertyString'" -Verbose
     $null = $CurrentFormula.Replace($propertyString, $newPropertyString)
 }
-
-Write-Host "::set-env name=NEW_FORMULA_VERSION::$expectedVersion"
 
 $expectedUrl = $urlTemplate -f $expectedVersion
 Write-Verbose "new url: $expectedUrl" -Verbose
 
-$urlString = Get-FormulaString -OriginalFomula $formulaString -PropertyName 'url'
+$versionString = Get-FormulaString -OriginalFomula $formulaString -PropertyName 'version'
 
-$urlPattern = '"([^"]*)"'
-if (! ($urlString -match "$urlPattern")) {
-    throw "url not found"
+$versionPattern = '(\d*\.\d*\.\d*(-\w*(\.\d*)?)?)'
+if (! ($versionString -match "`"$versionPattern`"")) {
+    throw "version not found"
 }
 
-$url = $Matches.1
-Write-Verbose "existing url: $url" -Verbose
+$version = $Matches.1
 
-$urlMatch = $url -eq $expectedUrl
-Write-Verbose "url Match: $urlMatch" -Verbose
-if ($urlMatch -and !$Force.IsPresent) {
+$versionMatch = $version -eq $expectedVersion
+if ($versionMatch -and !$Force.IsPresent) {
     Write-Verbose "Forumla is up to date, exiting." -Verbose
     return
 }
 
+Write-Host "::set-env name=NEW_FORMULA_VERSION::$expectedVersion"
 Write-Verbose "Updating formula ..." -Verbose
-
-$newFormula = [System.Text.StringBuilder]::new($formulaString -join [System.Environment]::NewLine)
 
 Update-Formula -PropertyName 'url' -CurrentFormula $newFormula -NewValue $expectedUrl -OriginalFomula $formulaString
 
-Update-Formula -PropertyName 'version_scheme' -CurrentFormula $newFormula -Increment -OriginalFomula $formulaString
+Update-Formula -PropertyName 'version' -CurrentFormula $newFormula -NewValue $expectedVersion -OriginalFomula $formulaString
 
-#assert_equal "7.1.0-preview.1",
 $versionPattern = '(\d*\.\d*\.\d*(-\w*(\.\d*)?)?)'
 Update-Formula -PropertyName 'assert_equal_version' -CurrentFormula $newFormula -NewValue $expectedVersion -Pattern ('^\s*assert_equal\s*"{0}",$' -f $versionPattern)  -OriginalFomula $formulaString
 
@@ -162,7 +157,5 @@ Remove-Item ./FileToHash.file
 Write-Verbose "hash: $hash"
 
 Update-Formula -PropertyName 'sha256' -CurrentFormula $newFormula -NewValue $hash -OriginalFomula $formulaString
-
-$null = $newFormula.Replace($versionString,$newVersionSchemeString)
 
 $newFormula.ToString() | Out-File -Encoding utf8NoBOM -FilePath $FormulaPath
