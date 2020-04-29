@@ -11,8 +11,8 @@ on:
       - '.github/workflows/powershell-daily.yml'
       - 'Formula/powershell-daily.rb'
   schedule:
-    # At 20:20 UTC on every day-of-week from Monday through Friday.
-    - cron:  '35 01 * * 1-5'
+    # At at 23 minutes after every hour, every day-of-week from Monday through Friday.
+    - cron:  '23 * * * 1-5'
 defaults:
   run:
     shell: pwsh
