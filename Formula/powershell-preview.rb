@@ -5,9 +5,10 @@ class PowershellPreview < Formula
   homepage "https://github.com/powershell/powershell"
   # We do not specify `version "..."` as 'brew audit' will complain - see https://github.com/Homebrew/legacy-homebrew/issues/32540
   url "https://github.com/PowerShell/PowerShell/releases/download/v7.1.0-preview.2/powershell-7.1.0-preview.2-osx-x64.tar.gz"
+  version "7.1.0-preview.2"
   # must be lower-case
   sha256 "3dbf802402e43816396909a1b95fe65c2f135bb7991cd20ebb3d9423187d4f7d"
-  version_scheme 100
+  version_scheme 1
   bottle :unneeded
 
   # .NET Core 3.1 requires High Sierra - https://docs.microsoft.com/en-us/dotnet/core/install/dependencies?pivots=os-macos&tabs=netcore31
