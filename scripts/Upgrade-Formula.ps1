@@ -6,7 +6,9 @@ param(
     $FormulaPath,
     [ValidateSet('Stable', 'Preview', 'Lts', 'Daily')]
     [string]
-    $Channel = 'Stable'
+    $Channel = 'Stable',
+    [switch]
+    $Force
 )
 
 $retryCount = 3
@@ -51,35 +53,24 @@ function Get-FormulaString
 
         [Parameter(Mandatory)]
         [string]
-        $PropertyName
+        $PropertyName,
+
+        [switch] $Increment
     )
 
     if ($Pattern) {
         $actualPattern = $Pattern
     }
+    elseif ($Increment.IsPresent) {
+        $actualPattern = '^\s*{0}\s*.*$' -f $PropertyName
+    }
     else {
         $actualPattern = '^\s*{0}\s*"([^"]*)"$' -f $PropertyName
     }
 
-    Write-Verbose "Finding $PropertyName uning $actualPattern" -Verbose
+    Write-Verbose "Finding $PropertyName uning $actualPattern"
 
     return $OriginalFomula | Select-String -Raw -Pattern $actualPattern
-}
-
-$versionString = Get-FormulaString -OriginalFomula $formulaString -PropertyName 'version_scheme'
-
-Write-Verbose $versionString -verbose
-$versionPattern = '(\d*\.\d*\.\d*(-\w*(\.\d*)?)?)'
-if (! ($versionString -match "`"$versionPattern`"")) {
-    throw "version not found"
-}
-
-$version = $Matches.1
-
-$versionMatch = $version -eq $expectedVersion
-Write-Verbose "version Match: $versionMatch" -Verbose
-if ($versionMatch) {
-    return
 }
 
 function Update-Formula {
@@ -95,43 +86,76 @@ function Update-Formula {
         [string]
         $Pattern,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory, ParameterSetName='newValue')]
         [string]
         $NewValue,
+
+        [Parameter(Mandatory, ParameterSetName='increment')]
+        [switch]
+        $Increment,
 
         [Parameter(Mandatory)]
         [string]
         $PropertyName
     )
 
-    $propertyString = Get-FormulaString -OriginalFomula $OriginalFomula -PropertyName $PropertyName -Pattern $Pattern
+    $propertyString = Get-FormulaString -OriginalFomula $OriginalFomula -PropertyName $PropertyName -Pattern $Pattern -Increment:$Increment.IsPresent
     if(!$propertyString)
     {
         throw "could not find $PropertyName"
     }
 
-    Write-Verbose $propertyString -Verbose
-    $newPropertyString = $propertyString -replace '"([^"]*)"', ('"{0}"' -f $NewValue)
+    if($Increment.IsPresent)
+    {
+        $actualValue = ([int] ($propertyString.Replace($PropertyName,'').Trim()))
+        $actualValue = $actualValue + 1
+        $newPropertyString = $propertyString -replace "$PropertyName\s*\d*", ('{0} {1}' -f $PropertyName, $actualValue)
+    }
+    else {
+        $newPropertyString = $propertyString -replace '"([^"]*)"', ('"{0}"' -f $NewValue)
+    }
 
+    Write-Verbose "replacing '$propertyString' with '$newPropertyString'" -Verbose
     $null = $CurrentFormula.Replace($propertyString, $newPropertyString)
 }
 
 Write-Host "::set-env name=NEW_FORMULA_VERSION::$expectedVersion"
 
-$url = $urlTemplate -f $expectedVersion
-Write-Verbose "new url: $url" -Verbose
+$expectedUrl = $urlTemplate -f $expectedVersion
+Write-Verbose "new url: $expectedUrl" -Verbose
+
+$urlString = Get-FormulaString -OriginalFomula $formulaString -PropertyName 'url'
+
+$urlPattern = '"([^"]*)"'
+if (! ($urlString -match "$urlPattern")) {
+    throw "url not found"
+}
+
+$url = $Matches.1
+Write-Verbose "existing url: $url" -Verbose
+
+$urlMatch = $url -eq $expectedUrl
+Write-Verbose "url Match: $urlMatch" -Verbose
+if ($urlMatch -and !$Force.IsPresent) {
+    Write-Verbose "Forumla is up to date, exiting." -Verbose
+    return
+}
+
+Write-Verbose "Updating formula ..." -Verbose
 
 $newFormula = [System.Text.StringBuilder]::new($formulaString -join [System.Environment]::NewLine)
 
-Update-Formula -PropertyName 'url' -CurrentFormula $newFormula -NewValue $url -OriginalFomula $formulaString
+Update-Formula -PropertyName 'url' -CurrentFormula $newFormula -NewValue $expectedUrl -OriginalFomula $formulaString
 
-
-Update-Formula -PropertyName 'version_scheme' -CurrentFormula $newFormula -NewValue $expectedVersion -OriginalFomula $formulaString
+Update-Formula -PropertyName 'version_scheme' -CurrentFormula $newFormula -Increment -OriginalFomula $formulaString
 
 #assert_equal "7.1.0-preview.1",
+$versionPattern = '(\d*\.\d*\.\d*(-\w*(\.\d*)?)?)'
 Update-Formula -PropertyName 'assert_equal_version' -CurrentFormula $newFormula -NewValue $expectedVersion -Pattern ('^\s*assert_equal\s*"{0}",$' -f $versionPattern)  -OriginalFomula $formulaString
 
-Invoke-WebRequest -Uri $url -OutFile ./FileToHash.file
+Write-Verbose "Getting file to calculate hash..." -Verbose
+$ProgressPreference = 'SilentlyContinue'
+Invoke-WebRequest -Uri $expectedUrl -OutFile ./FileToHash.file
 
 $hash = (Get-FileHash -Path ./FileToHash.file -Algorithm SHA256).Hash.ToLower()
 Remove-Item ./FileToHash.file
