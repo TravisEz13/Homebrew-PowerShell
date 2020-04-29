@@ -5,9 +5,9 @@ class PowershellDaily < Formula
   homepage "https://github.com/powershell/powershell"
   # We do not specify `version "..."` as 'brew audit' will complain - see https://github.com/Homebrew/legacy-homebrew/issues/32540
   url "https://pscoretestdata.blob.core.windows.net/v7-1-0-daily-20200429/powershell-7.1.0-daily.20200429-osx-x64.tar.gz"
+  version "7.1.0-daily.20200429"
   # must be lower-case
   sha256 "fe9b306c500e9ee1e616b580de601b13b0161ba2c6b023f0e2b895f28581f13c"
-  version "7.1.0-daily.20200429"
   version_scheme 1
   bottle :unneeded
 
@@ -27,9 +27,6 @@ class PowershellDaily < Formula
 
       Other application files were installed at:
         #{libexec}
-
-      If you also have the Cask installed, you need to run the following to make the formula your default install:
-        brew link --overwrite powershell-preview
 
       If you would like to make PowerShell you shell, run
         sudo echo '#{bin}/pwsh-daily' >> /etc/shells
