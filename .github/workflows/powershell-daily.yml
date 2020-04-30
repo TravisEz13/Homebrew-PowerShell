@@ -10,9 +10,9 @@ on:
     paths:
       - '.github/workflows/powershell-daily.yml'
       - 'Formula/powershell-daily.rb'
-  schedule:
+  #schedule:
     # At at 23 minutes after every hour, every day-of-week from Monday through Friday.
-    - cron:  '23 * * * 1-5'
+    #- cron:  '23 * * * 1-5'
 defaults:
   run:
     shell: pwsh
