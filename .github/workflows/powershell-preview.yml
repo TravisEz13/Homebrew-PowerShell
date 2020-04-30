@@ -10,9 +10,9 @@ on:
     paths:
       - '.github/workflows/powershell-preview.yml'
       - 'Formula/powershell-preview.rb'
-  schedule:
+  #schedule:
     # At 20:20 UTC on every day-of-week from Monday through Friday.
-    - cron:  '35 01 * * 1-5'
+    #- cron:  '35 01 * * 1-5'
 defaults:
   run:
     shell: pwsh
